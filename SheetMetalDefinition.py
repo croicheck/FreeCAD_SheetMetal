@@ -165,7 +165,7 @@ class UiSmdWindow(object):
             path = __dir__
         else:
             path = self.labelBendTable.text()
-
+        self.comboBox.clear()
         try:
             openedFile = QFileDialog.getOpenFileName(None, QString.fromLocal8Bit("Load .csv file"), path, "*.csv") # PyQt4
         except Exception:

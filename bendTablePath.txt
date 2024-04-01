@@ -1,2 +1,2 @@
-:
-/home/dominik/.local/share/FreeCAD/Mod/bendtable_colon.csv
+,
+/home/dominik/.local/share/FreeCAD/Mod/bendtable_example.csv
