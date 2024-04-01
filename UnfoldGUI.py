@@ -38,8 +38,8 @@ import SheetMetalUnfolder as smu
 modPath = os.path.dirname(__file__).replace("\\", "/")
 
 GENSKETCHCOLOR = "#000080"
-BENDSKETCHCOLOR = "#c00000"
-INTSKETCHCOLOR = "#ff5733"
+BENDSKETCHCOLOR = "#00ff00"
+INTSKETCHCOLOR = "#00ffff"
 KFACTOR = 0.40
 
 last_selected_mds = "none"
@@ -89,8 +89,12 @@ class SMUnfoldTaskPanel:
 
     def _isManualKSelected(self):
         return self.form.availableMds.currentIndex() == (
-            self.form.availableMds.count() - 1
+            self.form.availableMds.count() - 2
         )
+    
+    def _isBendTableSelected(self):
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            return True    
 
     def _isNoMdsSelected(self):
         return self.form.availableMds.currentIndex() == 0
@@ -296,7 +300,8 @@ class SMUnfoldTaskPanel:
             if mds.Label.startswith("material_"):
                 self.form.availableMds.addItem(mds.Label)
         self.form.availableMds.addItem("Manual K-Factor")
-
+        self.form.availableMds.addItem("Bend Table K-Factor")
+        
         selMdsIndex = self._getLastSelectedMdsIndex()
 
         if selMdsIndex >= 0:
@@ -328,3 +333,5 @@ class SMUnfoldTaskPanel:
         self.form.kfactorAnsi.setEnabled(isManualK)
         self.form.kfactorDin.setEnabled(isManualK)
         self.form.kFactSpin.setEnabled(isManualK)
+        if self._isBendTableSelected():
+            self.form.kFactSpin.setValue(FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").K_factor)

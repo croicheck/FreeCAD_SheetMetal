@@ -143,6 +143,12 @@ def smFold(
             # offset =  thk * kfactor
             # else :
             # offset = thk * (1 - kfactor )
+            
+            # croicheck -> workaround, I don't know why this happens...
+            # get rid of units because kfactor is here '1.0 mm' and not '1.0'
+            # else this error occurs: <class 'ArithmeticError'>: Quantity::operator +(): Unit mismatch
+            tmpkfactor = float(str(kfactor).replace(' mm', ''))
+            kfactor = tmpkfactor
 
             unfoldLength = (bendR + kfactor * thk) * bendA * math.pi / 180.0
             neutralRadius = bendR + kfactor * thk
@@ -276,11 +282,15 @@ class SMFoldWall:
     def __init__(self, obj):
         '''"Fold / Bend a Sheetmetal with given Bend Radius"'''
         selobj = Gui.Selection.getSelectionEx()
-
         _tip_ = FreeCAD.Qt.translate("App::Property", "Bend Radius")
-        obj.addProperty(
-            "App::PropertyLength", "radius", "Parameters", _tip_
-        ).radius = 1.0
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            obj.addProperty(
+                "App::PropertyLength", "radius", "Parameters", _tip_
+            ).radius = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").Radius
+        else:
+            obj.addProperty(
+                "App::PropertyLength", "radius", "Parameters", _tip_
+            ).radius = 1.0
         _tip_ = FreeCAD.Qt.translate("App::Property", "Bend Angle")
         obj.addProperty("App::PropertyAngle", "angle", "Parameters", _tip_).angle = 90.0
         _tip_ = FreeCAD.Qt.translate("App::Property", "Base Object")
@@ -296,9 +306,16 @@ class SMFoldWall:
             "App::PropertyBool", "invertbend", "Parameters", _tip_
         ).invertbend = False
         _tip_ = FreeCAD.Qt.translate("App::Property", "Neutral Axis Position")
-        obj.addProperty(
-            "App::PropertyFloatConstraint", "kfactor", "Parameters", _tip_
-        ).kfactor = (0.5, 0.0, 1.0, 0.01)
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            obj.addProperty(
+                "App::PropertyLength", "kfactor", "Parameters", _tip_
+            ).kfactor = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").K_factor
+        else:
+            obj.addProperty(
+                "App::PropertyLength", "kfactor", "Parameters", _tip_
+            ).kfactor = 1.0
+        obj.addProperty("App::PropertyBool", "isSheetMetal", "Sheet metal", "is Sheet Metal Feature")
+        obj.isSheetMetal = True
         _tip_ = FreeCAD.Qt.translate("App::Property", "Invert Bend Direction")
         obj.addProperty(
             "App::PropertyBool", "invert", "Parameters", _tip_

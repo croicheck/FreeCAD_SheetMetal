@@ -1332,9 +1332,13 @@ class SMBendWall:
         obj.Proxy = self
 
     def _addProperties(self, obj):
-        smAddLengthProperty(
-            obj, "radius", FreeCAD.Qt.translate("App::Property", "Bend Radius"), 1.0
-        )
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            radius = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").Radius
+            smAddLengthProperty(obj, "radius", "Bend Radius", radius)
+        else:
+            smAddLengthProperty(obj, "radius", "Bend Radius", 1.0)
+        smAddBoolProperty(obj, "isSheetMetal", "is Sheet Metal Feature", True, "Sheet metal")
+                
         smAddLengthProperty(
             obj, "length", FreeCAD.Qt.translate("App::Property", "Length of Wall"), 10.0
         )

@@ -302,18 +302,32 @@ class SMBaseShape:
         obj.Proxy = self
 
     def _addVerifyProperties(self, obj):
-        smAddLengthProperty(
-            obj,
-            "thickness",
-            FreeCAD.Qt.translate("SMBaseShape", "Thickness of sheetmetal", "Property"),
-            1.0,
-        )
-        smAddLengthProperty(
-            obj,
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            smAddLengthProperty(obj,
+            "radius",
+            FreeCAD.Qt.translate("SMBaseShape", "Bend Radius", "Property"), 
+            FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"
+            ).Radius)
+        else:
+            smAddLengthProperty(obj,
             "radius",
             FreeCAD.Qt.translate("SMBaseShape", "Bend Radius", "Property"),
-            1.0,
-        )
+            1.0)
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            smAddLengthProperty(obj,
+            "thickness",
+            FreeCAD.Qt.translate("SMBaseShape", "Thickness of sheetmetal", "Property"),
+            FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"
+            ).Thickness)
+        else:
+            smAddLengthProperty(obj,
+            "thickness",
+            FreeCAD.Qt.translate("SMBaseShape", "Thickness of sheetmetal", "Property"),
+            1.0)
+        smAddBoolProperty(obj,
+            "isSheetMetal",
+            "Makes this recomputable by change of bend table",
+            True)        
         smAddLengthProperty(
             obj,
             "width",

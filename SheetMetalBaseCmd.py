@@ -146,6 +146,9 @@ def smBase(
     reverse=False,
     MainObject=None,
 ):
+    if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+        thk = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").Thickness
+        radius = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").Radius
     # To Get sketch normal
     WireList = MainObject.Shape.Wires[0]
     mat = MainObject.getGlobalPlacement().Rotation
@@ -199,13 +202,25 @@ class SMBaseBend:
         selobj = Gui.Selection.getSelectionEx()[0]
 
         _tip_ = FreeCAD.Qt.translate("App::Property", "Bend Radius")
-        obj.addProperty(
-            "App::PropertyLength", "radius", "Parameters", _tip_
-        ).radius = 1.0
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            obj.addProperty(
+                "App::PropertyLength", "radius", "Parameters", _tip_
+            ).radius = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").Radius
+        else:
+            obj.addProperty(
+                "App::PropertyLength", "radius", "Parameters", _tip_
+            ).radius = 1.0
         _tip_ = FreeCAD.Qt.translate("App::Property", "Thickness of sheetmetal")
-        obj.addProperty(
-            "App::PropertyLength", "thickness", "Parameters", _tip_
-        ).thickness = 1.0
+        if FreeCAD.ActiveDocument.getObject("Sheet_metal_definition"):
+            obj.addProperty(
+                "App::PropertyLength", "thickness", "Parameters", _tip_
+            ).thickness = FreeCAD.ActiveDocument.getObject("Sheet_metal_definition").Thickness
+        else:
+            obj.addProperty(
+                "App::PropertyLength", "thickness", "Parameters", _tip_
+            ).thickness =  1.0
+        obj.addProperty("App::PropertyBool", "isSheetMetal", "Sheet metal", "is Sheet Metal Feature")
+        obj.isSheetMetal = True
         _tip_ = FreeCAD.Qt.translate("App::Property", "Relief Type")
         obj.addProperty(
             "App::PropertyEnumeration", "BendSide", "Parameters", _tip_
